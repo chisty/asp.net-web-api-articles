@@ -27,16 +27,17 @@ Let's see the following code of a message handler.
 ```csharp
 public class CustomRequestMessageHandler : DelegatingHandler
 {
-	protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage	request, CancellationToken cancellationToken)
+	protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage	request
+	                                                             , CancellationToken cancellationToken)
 	{
 		Debug.WriteLine(request.Method);
-	  if (request.Method == HttpMethod.Post)
-	  {
+		if (request.Method == HttpMethod.Post)
+		{
 			Debug.WriteLine("Request method is changed to Http Get.");
 			request.Method = new HttpMethod("Get");
-	  }
-	  var response = await base.SendAsync(request, cancellationToken);
-	  return response;
+		}
+		var response = await base.SendAsync(request, cancellationToken);
+		return response;
 	}
 }
 ```
@@ -74,7 +75,8 @@ Like, write the request type and redirect all *Http Post* method to *Http Get*. 
 ```csharp
 public class CustomRequestMessageHandler : DelegatingHandler
 {
-	protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage	request, CancellationToken cancellationToken)
+	protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage	request
+																 , CancellationToken cancellationToken)
 	{
 		Debug.WriteLine(request.Method);
 		if (request.Method == HttpMethod.Post)
@@ -112,7 +114,8 @@ In the next example we will see another message handler which will add a custom 
 ```csharp
 public class CustomResponseMessageHandler:DelegatingHandler
 {
-	protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+	protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request
+															, CancellationToken cancellationToken)
 	{
 		return base.SendAsync(request, cancellationToken).ContinueWith(t =>
 		{
@@ -149,7 +152,8 @@ Let’s assume we have two custom message handler like below
 ```csharp
 public class CustomMessageHandlerA : DelegatingHandler
 {
-	protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+	protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request
+															, CancellationToken cancellationToken)
 	{
 		Debug.WriteLine("Message Handler A invoked on request= {0}", request.RequestUri);
 		returnbase.SendAsync(request, cancellationToken).ContinueWith((task) =>
@@ -164,7 +168,8 @@ public class CustomMessageHandlerA : DelegatingHandler
 ```csharp
 public class CustomMessageHandlerB : DelegatingHandler
 {
-	protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+	protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request
+															, CancellationToken cancellationToken)
 	{
 		Debug.WriteLine("Message Handler B invoked on request= {0}", request.RequestUri);
 		return base.SendAsync(request, cancellationToken).ContinueWith((task) =>
@@ -188,6 +193,7 @@ public static class WebApiConfig
 		//Other codes go here....
 	}
 }
+```
 
 We can register specific message handler for any specific route. Here, if the request URI matches *Route2*, the request is dispatched to *CustomMessageHandlerB*. But, *CustomMessageHandlerA* invokes globally.
 
