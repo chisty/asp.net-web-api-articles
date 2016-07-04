@@ -1,6 +1,6 @@
 # Message Handlers and Filters
 
-In this chapter, we will cover:
+In this article, we will cover:
 
 *	Exploring the Message Handler Mechanism
 *	Creating Custom Message handlers
@@ -46,13 +46,13 @@ public class CustomRequestMessageHandler : DelegatingHandler
 
 ### How it works
 
-In Web API, **DelegatingHandler** is used to process **HttpRequestMessage** & **HttpResponseMessage** and invoke another **DelegatingHandler**. It is an abstraction which already knows how to work in a pipeline. **DelegatingHandler** is a derived class from **HttpMessageHandler** and has a property of **InnerHandler**. All these custom handlers are chained together using the **InnerHandler** property. Every **InnerHandler** is assigned to another outside message handler and the last message handlerís **InnerHandler** has to be assigned with the **HttpControllerDispatcher**, to create a valid **ApiController**. If we donít assign the last handler to **HttpControllerDispatcher**, the pipeline will not work and exception will be created at runtime saying that **InnerHandler** property of the last message handler is null or is not set.
+In Web API, **DelegatingHandler** is used to process **HttpRequestMessage** & **HttpResponseMessage** and invoke another **DelegatingHandler**. It is an abstraction which already knows how to work in a pipeline. **DelegatingHandler** is a derived class from **HttpMessageHandler** and has a property of **InnerHandler**. All these custom handlers are chained together using the **InnerHandler** property. Every **InnerHandler** is assigned to another outside message handler and the last message handler‚Äôs **InnerHandler** has to be assigned with the **HttpControllerDispatcher**, to create a valid **ApiController**. If we don‚Äôt assign the last handler to **HttpControllerDispatcher**, the pipeline will not work and exception will be created at runtime saying that **InnerHandler** property of the last message handler is null or is not set.
 
 In the next section, we will discuss about custom message handlers and its implementation.
 
 ## Creating Custom Message handlers
 
-Sometimes customization is necessary. And custom message handler gives the opportunity to perform our custom logic at the level of Http messages rather than controller actions. Custom message handler might be useful in some cases, like ñ
+Sometimes customization is necessary. And custom message handler gives the opportunity to perform our custom logic at the level of Http messages rather than controller actions. Custom message handler might be useful in some cases, like ‚Äì
 *	Log each and every request.
 *	Monitor each request, protocol version, type etc.
 *	Modify request headers, add response headers.
@@ -147,7 +147,7 @@ If there are multiple custom message handlers, they will execute depending on th
 
 ### How to do it
 
-Letís assume we have two custom message handler like below
+Let‚Äôs assume we have two custom message handler like below
 
 ```csharp
 public class CustomMessageHandlerA : DelegatingHandler
@@ -254,9 +254,9 @@ There are four types of filter.
 *	Action(should be registered with controller/action)
 *	Exception (invokes if there is any exception)
 
-When a request comes first in their pipeline, the **AuthenticationFilter** runs first. It implements the **IAuthenticationFilter** interface which has 2 methods: **AuthenticateAsync**, **ChallengeAsync**. **AuthenticateAsync** contains the core authentication logic like authenticate the request by validating credentials. If the authentication is successful, this filter creates an **IPrincipal** and attaches to the request by setting **context.Principal**. Otherwise, **context.ErrorResult** is set which basically gets translated to **ì401-Unauthorizedî** Http status code.
+When a request comes first in their pipeline, the **AuthenticationFilter** runs first. It implements the **IAuthenticationFilter** interface which has 2 methods: **AuthenticateAsync**, **ChallengeAsync**. **AuthenticateAsync** contains the core authentication logic like authenticate the request by validating credentials. If the authentication is successful, this filter creates an **IPrincipal** and attaches to the request by setting **context.Principal**. Otherwise, **context.ErrorResult** is set which basically gets translated to **‚Äú401-Unauthorized‚Äù** Http status code.
 
-**AuthorizationFilter** runs after **AuthenticationFilter**. It extends the **AuthorizationFilterAttribute** and we have to override the **OnAuthorization** or **OnAuthorizationAsync** method which will contain the main logic of authorization of any resources. If this filter fails then it may return a **ì401-Unauthorizedî** Http status code also.
+**AuthorizationFilter** runs after **AuthenticationFilter**. It extends the **AuthorizationFilterAttribute** and we have to override the **OnAuthorization** or **OnAuthorizationAsync** method which will contain the main logic of authorization of any resources. If this filter fails then it may return a **‚Äú401-Unauthorized‚Äù** Http status code also.
 
 **ActionFilters** are invoked before entering to the **ApiController** action. We need to extend the filter from **ActionFilterAttribute** and override the **OnActionExecuting** or **OnActionExecuted** method. **OnActionExecuting** runs before the controller action is invoked and **OnActionExecuted** runs after the controller is done performing its task.
 
@@ -331,7 +331,7 @@ public class BookController : ApiController
 
 ### How it works
 
-We add this *CustomFilter* attribute on top of any **ApiController** for registration. Whenever any request invokes **ApiController**, the *CustomFilter* executes if it is already added with that **ApiController**. Inside the *CustomFilter*, we override the **OnAuthorization** method and inspected the **HttpRequestMessage** and its absolute path. We only pass those requests which do not have a fixed controller or action name *ìbookî*. If the absolute path contains that specific name, we purposefully attach a custom **HttpResponseMessage** and *Unauthorized HttpStatusCode* with the **HttpActionContext**. Then If we invoke the *BookApiController* using Postman, it returns us HttpStatusCode *ì401-Unauthorizedî*. The screenshot is attached below.
+We add this *CustomFilter* attribute on top of any **ApiController** for registration. Whenever any request invokes **ApiController**, the *CustomFilter* executes if it is already added with that **ApiController**. Inside the *CustomFilter*, we override the **OnAuthorization** method and inspected the **HttpRequestMessage** and its absolute path. We only pass those requests which do not have a fixed controller or action name *‚Äúbook‚Äù*. If the absolute path contains that specific name, we purposefully attach a custom **HttpResponseMessage** and *Unauthorized HttpStatusCode* with the **HttpActionContext**. Then If we invoke the *BookApiController* using Postman, it returns us HttpStatusCode *‚Äú401-Unauthorized‚Äù*. The screenshot is attached below.
 
 # Insert Image
 
@@ -409,7 +409,7 @@ public class BookController : ApiController
 }
 ```
 
-If we want to use our custom filter with every request or controller action, we need to register it globally. We donít need to attach this with every **ApiController**. Rather we have to register that filter with **HttpConfiguration**.
+If we want to use our custom filter with every request or controller action, we need to register it globally. We don‚Äôt need to attach this with every **ApiController**. Rather we have to register that filter with **HttpConfiguration**.
 
 ```csharp
 public static class WebApiConfig
@@ -417,7 +417,7 @@ public static class WebApiConfig
 	public static void Register(HttpConfiguration config)
 	{
 		config.Filters.Add(newCustomFilter());
-		//ÖÖÖÖÖÖÖÖÖÖ other codes here  ÖÖÖÖÖÖÖÖÖÖÖÖ //
+		//‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶ other codes here  ‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶‚Ä¶ //
 	}
 }
 ```
