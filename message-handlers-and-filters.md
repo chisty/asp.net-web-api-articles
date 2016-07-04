@@ -62,7 +62,7 @@ Sometimes customization is necessary. And custom message handler gives the oppor
 To write a custom message handler, derive from **System.Net.Http.DelegatingHandler** and override the **SendAsync** method. This method has the following signature:
 
 ```csharp
-Task<HttpResponseMessage>SendAsync(HttpRequestMessage request, CancellationTokencancellationToken)
+Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 ```
 
 Here we will see both custom request and response message handler separately and also how they work.
