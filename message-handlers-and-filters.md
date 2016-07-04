@@ -337,3 +337,120 @@ We add this *CustomFilter* attribute on top of any **ApiController** for registr
 
 ## Registering Filters
 
+Filter attributes can be easily attached in class level and method level which actually register them in controller level and action level accordingly.
+
+### How to do it
+
+If we want to use any filter on a full **ApiController**, we can use it like attribute. We just need to attach the filter above the **ApiController** class declaration. No registration in **HttpConfiguration** is required.  Every time we call any action of that **ApiController** the filter fires on time depending its type. 
+
+```csharp
+[CustomFilter]
+public class BookController : ApiController
+{            
+	public IEnumerable<Book> Get()
+	{
+		using (var db= new BookContext())
+		{
+			return db.Books.Take(100).ToList();
+		}
+	}
+
+	public IHttpActionResult Get(int id)
+	{
+		using (var db= new BookContext())
+		{
+			var book = db.Books.FirstOrDefault(b => b.Id == id);
+			if (book == null)
+				return NotFound();
+			return Ok(book);
+		}
+	}
+
+	public void Post([FromBody]string value)
+	{
+	}
+
+	public void Put(int id, [FromBody]string value)
+	{
+	}
+
+	public void Delete(int id)
+	{
+	}
+}
+```
+
+Sometimes we want to attach some filter with some specific action of any **ApiController**. In that scenario, we declare the filter above the **Action** name rather than **ApiController** class name. So, when the appropriate *Action/Method* is called on this **ApiController**, the filter runs.
+
+```csharp
+public class BookController : ApiController
+{            
+	public IEnumerable<Book> Get()
+	{
+		using (var db= new BookContext())
+		{
+			return db.Books.Take(100).ToList();
+		}
+	}
+
+	[CustomFilter]
+	public IHttpActionResult Get(int id)
+	{
+		using (var db= new BookContext())
+		{
+			var book = db.Books.FirstOrDefault(b => b.Id == id);
+			if (book == null)
+				return NotFound();
+			return Ok(book);
+		}
+	}
+
+	//Other Code goes here ...
+}
+```
+
+If we want to use our custom filter with every request or controller action, we need to register it globally. We don’t need to attach this with every **ApiController**. Rather we have to register that filter with **HttpConfiguration**.
+
+```csharp
+public static class WebApiConfig
+{
+	public static void Register(HttpConfiguration config)
+	{
+		config.Filters.Add(newCustomFilter());
+		//………………………… other codes here  ……………………………… //
+	}
+}
+```
+
+### How it works
+
+In the first scenario, if we request to any action of *BookController* **ApiController**, every request goes through CustomFilter's **OnAuthorization** method. Where we purposefully blocked every request and returned *HttpStatusCode.Unauthorized* in response. So, when we invoke any action of *BookController*, the response of postman also shown by a screenshot.
+
+Request URIexample:	
+
+http://localhost:10157/api/book
+
+http://localhost:10157/api/book/2
+
+# Insert Image
+
+And in the second scenario, we added the *CustomFilter* with only one action. So, for that action the *CustomFilter* executes. But all other action gives as expected output. Like, if request with the following url:
+
+http://localhost:10157/api/book/2
+
+The output is the same like above screenshot which shows *"401 Unauthorized"*.
+
+But if we request with following url:
+
+http://localhost:10157/api/book
+
+The output screenshot of postman is like below:
+
+# Insert Image
+
+And for the third scenario, we registered out *CustomFilter* with **HttpConfiguration** in **WebApiConfig**. So, every time we send a request to the server, it fires the global custom filter automatically for every **ApiController**, **Action** name. It is very useful in cases like authorizing every request, running exception filters on time etc.
+
+## Differentiating between Message handler and Filters
+
+Though message handler and filter seems very likely, the major difference between them is their scope and focus. We can arrange the differences in the following table.
+s
