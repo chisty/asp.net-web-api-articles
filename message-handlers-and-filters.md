@@ -18,7 +18,7 @@ Typically, a series of message handlers are chained together. Every handler rece
 
 # IMAGE INSERT
 
-Web host gives the request to **HttpServer** which passes through a series of **HttpMessageHandlers**. This chain of responsibility ends at **HttpControllerDispatcher**. The dispatcher then sends the request to appropriate controller.  Both **HttpServer**, **HttpControllerDispatcher** are built-in message handler.
+Web host gives the request to *HttpServer* which passes through a series of **HttpMessageHandlers**. This chain of responsibility ends at **HttpControllerDispatcher**. The dispatcher then sends the request to appropriate controller.  Both *HttpServer*, *HttpControllerDispatcher* are built-in message handler.
 
 ### How to do it
 
@@ -69,7 +69,7 @@ Here we will see both custom request and response message handler separately and
 
 In the first example, we will write a custom message handler which will log the requested Http method and do some tweak based on their types. 
 
-Like, write the request type and redirect all Http Post method to Http Get. Here is the code:
+Like, write the request type and redirect all *Http Post* method to *Http Get*. Here is the code:
 
 ```csharp
 public class CustomRequestMessageHandler : DelegatingHandler
@@ -88,7 +88,7 @@ public class CustomRequestMessageHandler : DelegatingHandler
 }
 ```
 
-And we have to register the message handler in our **WebApiConfig** class inside the **App_Start** directory like this:
+And we have to register the message handler in our **WebApiConfig** class inside the *App_Start* directory like this:
 
 ```csharp
 public static class WebApiConfig
@@ -132,8 +132,202 @@ After running the web service, if we invoke the URL using postman, the response 
 
 ### How it works
 
-The first example illustrates a simple custom message handler. When any Http request arrives, **CustomRequestMessageHandler** executes as it is already registered in **WebApiConfig**. It can modify Http request and do custom operations. In this example, it prints the Http request type (debug mode) and then checks whether the request is a *POST* method or not. If yes, then it modifies the Http request method to *GET* method.Then the handler calls **base.SendAsync()** to pass the request to the inner message handler. The inner handler returns a response message asynchronously using a **Task<T>** object. The response message is not available until **base.SendAsync()** completes asynchronously.
+The first example illustrates a simple custom message handler. When any Http request arrives, *CustomRequestMessageHandler* executes as it is already registered in **WebApiConfig**. It can modify Http request and do custom operations. In this example, it prints the Http request type (debug mode) and then checks whether the request is a *POST* method or not. If yes, then it modifies the Http request method to *GET* method.Then the handler calls **base.SendAsync()** to pass the request to the inner message handler. The inner handler returns a response message asynchronously using a **Task<T>** object. The response message is not available until **base.SendAsync()** completes asynchronously.
 
 This example uses the *await* keyword to perform work asynchronously after **SendAsync** completes. And in the third image we can see that it returns JSON value from the GET action.
 
-We already said that if we need to work on the response, we need to do it in the continuation of the Task. A continuation is a task that is created in the **WaitingForActivation** state. It is activated automatically when its antecedent task or tasks complete. A continuation is itself a Task and does not block the thread on which it is started. In the second example, we implement the exact same thing. It adds a dummy custom header in the response. At times of going out from the pipeline, the **CustomResponseMessageHandler** adds a dummy custom header in the response. So, when we invoke the GET method using postman, we can see in the last image that the response header contains the extra dummy header.
+We already said that if we need to work on the response, we need to do it in the continuation of the Task. A continuation is a task that is created in the **WaitingForActivation** state. It is activated automatically when its antecedent task or tasks complete. A continuation is itself a Task and does not block the thread on which it is started. In the second example, we implement the exact same thing. It adds a dummy custom header in the response. At times of going out from the pipeline, the *CustomResponseMessageHandler* adds a dummy custom header in the response. So, when we invoke the GET method using postman, we can see in the last image that the response header contains the extra dummy header.
+
+## Registering Custom Message Handlers
+
+If there are multiple custom message handlers, they will execute depending on their registered order, whether they are registered globally or per route. Global message handlers are executed before **HttpRoutineDispatcher**, while per route message handlers are executed after it. 
+
+### How to do it
+
+Let’s assume we have two custom message handler like below
+
+```csharp
+public class CustomMessageHandlerA : DelegatingHandler
+{
+	protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+	{
+		Debug.WriteLine("Message Handler A invoked on request= {0}", request.RequestUri);
+		returnbase.SendAsync(request, cancellationToken).ContinueWith((task) =>
+		{
+			Debug.WriteLine("Message Handler A invoked on response={0}", task.Result.StatusCode);
+			return task.Result;
+		}, cancellationToken);
+	}
+}
+```
+
+```csharp
+public class CustomMessageHandlerB : DelegatingHandler
+{
+	protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+	{
+		Debug.WriteLine("Message Handler B invoked on request= {0}", request.RequestUri);
+		return base.SendAsync(request, cancellationToken).ContinueWith((task) =>
+		{
+			Debug.WriteLine("Message Handler B invoked on response={0}", task.Result.StatusCode);
+			return task.Result;
+		}, cancellationToken);
+	}
+}
+```
+
+To add a message handler on the server side, add the handler to **HttpConfiguration.MessageHandlers** collection. These handlers will be registered globally.
+
+```csharp
+public static class WebApiConfig
+{
+	public static void Register(HttpConfiguration config)
+	{
+		config.MessageHandlers.Add(newCustomMessageHandlerA());         				
+		config.MessageHandlers.Add(newCustomMessageHandlerB());
+		//Other codes go here....
+	}
+}
+
+We can register specific message handler for any specific route. Here, if the request URI matches *Route2*, the request is dispatched to *CustomMessageHandlerB*. But, *CustomMessageHandlerA* invokes globally.
+
+```csharp
+public static class WebApiConfig
+{
+	public static void Register(HttpConfiguration config)
+	{
+		config.Routes.MapHttpRoute(
+			name: "DefaultApi",
+			routeTemplate: "api/{controller}/{id}",
+			defaults: new {id = RouteParameter.Optional}
+		);
+
+		config.Routes.MapHttpRoute(
+			name: "Route2",
+			routeTemplate: "api2/{controller}/{id}",
+			defaults: new {id = RouteParameter.Optional},
+			constraints: null,
+			handler: new CustomMessageHandlerB// per-route message handler
+			{
+				InnerHandler =new HttpControllerDispatcher(config)
+			}
+		);
+		config.MessageHandlers.Add(new CustomMessageHandlerA());  // global message handler
+    }
+}
+```
+
+### How it works
+
+Message handlers are called in the same order that they registered in **HttpConfiguration**. And the response message flows in other direction. The last handler performs first in response message. When we register the custom handlers globally and make any request to the server, we can see the following output in Visual Studio. The debug output screenshot is given below.
+
+# Insert Image
+
+In the above screenshot it is clearly visible that, the request message and response message goes *bidirectional*.  We registered & sequentially. But when we invoked a request to *http://localhost:10157/api/book* , *CustomMessageHandlerA* invoked first on request and *CustomMessageHandlerB* invoked second. But, on response *CustomMessageHandlerB* invoked first and *CustomMessageHandlerA* invoked later.
+
+In the second example we implemented per route message handler. Here we registered *CustomMessageHandlerB* for Route2. If we invoke with **DefaultApi** then only globally registered messagehandler *CustomMessageHandlerA* invokes. The debug output is attached below.
+
+*Request Url: http://localhost:10157/api/book*
+
+# Insert Image
+
+But if we invoke *Route2*, both the global and per route registered message handler works. In that case, we will see that both *CustomMessageHandlerA* and *CustomMessageHandlerB* is working sequentially.
+
+*Request Url: http://localhost:10157/api2/book*
+
+
+# Insert Image
+
+## Implementing Filters
+
+Filters add some extra customization in our web services. We can implement our custom logic using filter which we want to run in some specific region. Most of the times filters are used as attributes as it is very handy to use in controllers, actions. 
+
+There are four types of filter.
+*	Authentication (determines the identity of the client)
+*	Authorization (determines the client has access to requested resources)
+*	Action(should be registered with controller/action)
+*	Exception (invokes if there is any exception)
+
+When a request comes first in their pipeline, the **AuthenticationFilter** runs first. It implements the **IAuthenticationFilter** interface which has 2 methods: **AuthenticateAsync**, **ChallengeAsync**. **AuthenticateAsync** contains the core authentication logic like authenticate the request by validating credentials. If the authentication is successful, this filter creates an **IPrincipal** and attaches to the request by setting **context.Principal**. Otherwise, **context.ErrorResult** is set which basically gets translated to **“401-Unauthorized”** Http status code.
+
+**AuthorizationFilter** runs after **AuthenticationFilter**. It extends the **AuthorizationFilterAttribute** and we have to override the **OnAuthorization** or **OnAuthorizationAsync** method which will contain the main logic of authorization of any resources. If this filter fails then it may return a **“401-Unauthorized”** Http status code also.
+
+**ActionFilters** are invoked before entering to the **ApiController** action. We need to extend the filter from **ActionFilterAttribute** and override the **OnActionExecuting** or **OnActionExecuted** method. **OnActionExecuting** runs before the controller action is invoked and **OnActionExecuted** runs after the controller is done performing its task.
+
+We need to extend the **ExceptionFilter** from **ExceptionFilterAttribute** and override the **OnException** or **OnExceptionAsync** method. When there is any exception situation, the **ExceptionFilter** fires immediately if any filter is registered with the **ApiController**.
+
+All the filters run sequentially without violating the order. But controller level registered filter runs before the action level registered filter. And if there is multiple filter of same category registered then invoking order is determined by *FilterScope* given below. Globally defined filters run first, then controller specific filters and then action specific filters. The lowest value gets the privilege to perform first.
+
+```csharp
+public enum FilterScope
+{
+	Action= 20,
+	Controller= 10,
+	Global= 0
+}
+```
+
+### How to do it
+
+Here is an example of custom authorization filter:
+
+```csharp
+public class CustomFilter : AuthorizationFilterAttribute
+{
+	public override void OnAuthorization(HttpActionContext actionContext)
+	{
+		const string apiControllerActionName = "book";
+		var absolutePath = actionContext.Request.RequestUri.AbsolutePath.ToLower();
+		if (absolutePath.Contains(apiControllerActionName))
+		{
+			var response = new HttpResponseMessage(HttpStatusCode.Unauthorized)
+			{
+				Content = newStringContent("You are not authorized.")
+			};
+			actionContext.Response = response;
+		}
+	}
+}
+```
+
+And we attached the above custom filter with our *BookController* **ApiController** like this -
+
+```csharp
+[CustomFilter]
+public class BookController : ApiController
+{            
+	public IEnumerable<Book> Get()
+	{
+		using (var db= new BookContext())
+		{
+			return db.Books.Take(100).ToList();
+		}
+	}
+
+	public IHttpActionResult Get(int id)
+    {
+		using (var db= new BookContext())
+		{
+			var book = db.Books.FirstOrDefault(b => b.Id == id);
+			if (book == null)
+				return NotFound();
+			return Ok(book);
+		}
+	}
+
+	public void Post([FromBody]string value)
+	{
+	}
+
+	// Other code goes here ...
+}
+```
+
+### How it works
+
+We add this *CustomFilter* attribute on top of any **ApiController** for registration. Whenever any request invokes **ApiController**, the *CustomFilter* executes if it is already added with that **ApiController**. Inside the *CustomFilter*, we override the **OnAuthorization** method and inspected the **HttpRequestMessage** and its absolute path. We only pass those requests which do not have a fixed controller or action name *“book”*. If the absolute path contains that specific name, we purposefully attach a custom **HttpResponseMessage** and *Unauthorized HttpStatusCode* with the **HttpActionContext**. Then If we invoke the *BookApiController* using Postman, it returns us HttpStatusCode *“401-Unauthorized”*. The screenshot is attached below.
+
+# Insert Image
+
+## Registering Filters
+
