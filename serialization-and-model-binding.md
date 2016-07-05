@@ -8,13 +8,13 @@ In this article, we will cover:
 *	[Validating the Model] (https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#validating-the-model)
 *	[Binding Parameters] (https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#binding-parameters)
 
-Serialization and model binding are important topic in Web API as their performance impact is very significant in Web API. At times of working with custom *MIME types*, data validation, these concepts are very useful. We can implement our own custom logic in media formatter, data serialization, content negotiation and model validation. These gives us enough flexibility to write clean and simple code with complex data types. 
+Serialization and model binding are important topic in Web API as their performance impact is very significant. At times of working with custom *MIME types*, data validation, these concepts are very useful. We can implement our own custom logic in media formatter, data serialization, content negotiation and model validation. These gives us enough flexibility to write clean and simple code with complex data types. 
 
 ## Creating media formatter
 
 Media type or MIME type allows the client and server to define the type of the data pass in http body. It refers the value of the *content-type header* within an Http request and response. It also used with *accept header* in the request to allow content negotiation.
 
-*Media formatters* are used to define our own custom content-type / media type with which we can expose our logic/data to specific clients and represent data in our own specific format. The default formatters in Web API are ñ *XML*, *JSON* and *form-url encoded* data formatters.
+*Media formatters* are used to define our own custom content-type / media type with which we can expose our logic/data to specific clients and represent data in our own specific format. The default formatters in Web API are ‚Äì *XML*, *JSON* and *form-url encoded* data formatters.
 
 To write a custom media formatter we have to extend from **BufferedMediaTypeFormatter** or **MediaTypeFormatter** abstract class. The **BufferedMediaTypeFormatter** is also extended from **MediaTypeFormatter** and uses synchronous read/write methods, where **MediaTypeFormatter** uses asynchronous methods.
 
@@ -97,7 +97,7 @@ public static class WebApiConfig
 
 Here we extend the *DoubleEqualCustomMediaFormatter* from **BufferedMediaTypeFormatter** and did the overriding of *CanReadType*, *CanWriteType* and *WriteToStream* methods.
 
-**CanReadType** decides which type the formatters can deserialize and **CanWriteType** decides which types it can serialize. Here the code returned false from **CanReadType** as we didnít want to deserialize the type. In **CanWriteType**, we checked whether the type is our Book type or its *IEnumerable* collection. If the type match is successful, then we returned true otherwise false. We did overriding of **WriteToStream** with our custom logic to serialize our custom type by writing to stream. In every line which we wrote in stream, we separated the properties with *double equal sign (==)*.
+**CanReadType** decides which type the formatters can deserialize and **CanWriteType** decides which types it can serialize. Here the code returned false from **CanReadType** as we didn‚Äôt want to deserialize the type. In **CanWriteType**, we checked whether the type is our Book type or its *IEnumerable* collection. If the type match is successful, then we returned true otherwise false. We did overriding of **WriteToStream** with our custom logic to serialize our custom type by writing to stream. In every line which we wrote in stream, we separated the properties with *double equal sign (==)*.
 
 Using Postman when we sent request to our **ApiController** attaching *custom accept header*, our *custom media formatter* executed and gave the expected result. The result screenshot are attached below:
 
@@ -211,9 +211,9 @@ And when we requested back to server with the serialized data via *Http Post* me
 
 ## Negotiating the content
 
-The *HTTP specification (RFC 2616)* defines content negotiation as *ìthe process of selecting the best representation for a given response when there are multiple representations available.î*
+The *HTTP specification (RFC 2616)* defines content negotiation as *‚Äúthe process of selecting the best representation for a given response when there are multiple representations available.‚Äù*
 
-Itís not always possible for the server to return data as per the requested format. So, the client and server can negotiate and decide the best representation of data. The requested format is determined by inspecting the request header. 
+It‚Äôs not always possible for the server to return data as per the requested format. So, the client and server can negotiate and decide the best representation of data. The requested format is determined by inspecting the request header. 
 
 ### How to do it
 
@@ -357,7 +357,7 @@ But when we passed *0 (zero)* in Price property, the **ModelState.IsValid** retu
 
 ## Binding parameters
 
-When Web Api calls a method of any **ApiController**, it sets value for the parameters of that action. This is called parameter binding. The main goal of parameter binding is to convert the request into **.Net types**. It sets value to the **ApiController** action methodís parameter. By default Web Api follows the following rules:
+When Web Api calls a method of any **ApiController**, it sets value for the parameters of that action. This is called parameter binding. The main goal of parameter binding is to convert the request into **.Net types**. It sets value to the **ApiController** action method‚Äôs parameter. By default Web Api follows the following rules:
 
 *	For simple types, Web API gets the value from request URI. Simple types are .NET primitive types, TimeSpan, DateTime, Guid, Decimal, String or anything with a TypeConverter which converts from strings.
 *	For complex types, Web API gets the value from message body.
