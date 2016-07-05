@@ -105,9 +105,11 @@ public static class WebApiConfig
 
 Now using Postman if we invoke to its Post method, we will see that the debugger hits the Get action in the controller and results a JSON value in response.
 
-# Image Insert
+![alt text](https://github.com/chisty/asp.net-web-api-articles/blob/master/images/mhf_2.png "Post screenshot 1")
 
-# Image Insert
+![alt text](https://github.com/chisty/asp.net-web-api-articles/blob/master/images/mhf_3.png "BookController Api screenshot 1")
+
+![alt text](https://github.com/chisty/asp.net-web-api-articles/blob/master/images/mhf_4.png "Postman screenshot shows Get response instead of Post response")
 
 In the next example we will see another message handler which will add a custom header with the response header. The code is shown below.
 
@@ -131,7 +133,7 @@ And again, we have to add this message handler to our **WebApiConfig** class lik
 
 After running the web service, if we invoke the URL using postman, the response header brings an extra custom header with it.
 
-# Image Insert
+![alt text](https://github.com/chisty/asp.net-web-api-articles/blob/master/images/mhf_5.png "Postman screenshot shows Get response with custom header")
 
 ### How it works
 
@@ -227,7 +229,7 @@ public static class WebApiConfig
 
 Message handlers are called in the same order that they registered in **HttpConfiguration**. And the response message flows in other direction. The last handler performs first in response message. When we register the custom handlers globally and make any request to the server, we can see the following output in Visual Studio. The debug output screenshot is given below.
 
-# Insert Image
+![alt text](https://github.com/chisty/asp.net-web-api-articles/blob/master/images/mhf_6.png "Debug output screenshot for custom message handler invoke sequence")
 
 In the above screenshot it is clearly visible that, the request message and response message goes *bidirectional*.  We registered & sequentially. But when we invoked a request to *http://localhost:10157/api/book* , *CustomMessageHandlerA* invoked first on request and *CustomMessageHandlerB* invoked second. But, on response *CustomMessageHandlerB* invoked first and *CustomMessageHandlerA* invoked later.
 
@@ -235,14 +237,13 @@ In the second example we implemented per route message handler. Here we register
 
 *Request Url: http://localhost:10157/api/book*
 
-# Insert Image
+![alt text](https://github.com/chisty/asp.net-web-api-articles/blob/master/images/mhf_7.png "Debug screenshot for global message handler")
 
 But if we invoke *Route2*, both the global and per route registered message handler works. In that case, we will see that both *CustomMessageHandlerA* and *CustomMessageHandlerB* is working sequentially.
 
 *Request Url: http://localhost:10157/api2/book*
 
-
-# Insert Image
+![alt text](https://github.com/chisty/asp.net-web-api-articles/blob/master/images/mhf_8.png "Debug screenshot for custom route message handler")
 
 ## Implementing Filters
 
@@ -333,7 +334,7 @@ public class BookController : ApiController
 
 We add this *CustomFilter* attribute on top of any **ApiController** for registration. Whenever any request invokes **ApiController**, the *CustomFilter* executes if it is already added with that **ApiController**. Inside the *CustomFilter*, we override the **OnAuthorization** method and inspected the **HttpRequestMessage** and its absolute path. We only pass those requests which do not have a fixed controller or action name *“book”*. If the absolute path contains that specific name, we purposefully attach a custom **HttpResponseMessage** and *Unauthorized HttpStatusCode* with the **HttpActionContext**. Then If we invoke the *BookApiController* using Postman, it returns us HttpStatusCode *“401-Unauthorized”*. The screenshot is attached below.
 
-# Insert Image
+![alt text](https://github.com/chisty/asp.net-web-api-articles/blob/master/images/mhf_9.png "Postman screenshot with custom filter status for Get request")
 
 ## Registering Filters
 
@@ -432,7 +433,7 @@ http://localhost:10157/api/book
 
 http://localhost:10157/api/book/2
 
-# Insert Image
+![alt text](https://github.com/chisty/asp.net-web-api-articles/blob/master/images/mhf_10.png "Postman screenshot with custom filter")
 
 And in the second scenario, we added the *CustomFilter* with only one action. So, for that action the *CustomFilter* executes. But all other action gives as expected output. Like, if request with the following url:
 
@@ -446,11 +447,17 @@ http://localhost:10157/api/book
 
 The output screenshot of postman is like below:
 
-# Insert Image
+![alt text](https://github.com/chisty/asp.net-web-api-articles/blob/master/images/mhf_11.png "Postman screenshot with custom filter showing other action is not accessible")
 
 And for the third scenario, we registered out *CustomFilter* with **HttpConfiguration** in **WebApiConfig**. So, every time we send a request to the server, it fires the global custom filter automatically for every **ApiController**, **Action** name. It is very useful in cases like authorizing every request, running exception filters on time etc.
 
 ## Differentiating between Message handler and Filters
 
 Though message handler and filter seems very likely, the major difference between them is their scope and focus. We can arrange the differences in the following table.
-s
+
+| Message handler                     | Filter                                |
+| ------------------------------------|---------------------------------------|
+| The message handlers are the very first stage in the Http request-response pipeline.| The filters are the next stage of message handler.|
+| They invoked and perform in Http message level, not in **ApiController** level.| They invoked and perform in **ApiController** level.|
+| As we can use a chain of handlers and the request flows in and out sequentially, we can write complex logics in them which work sequentially. We can modify the request and also the response headers before the response goes out through the Web API pipeline. | Filters are in different types with different purposes. Some filters invokes if there is some specific condition happens (**ExceptionFilters** fires if there is any exception). Some filter works on **ApiController** level. Filters can be invoked globally, per controller, per action.|
+| We need to register custom message handler separately in **HttpConfiguration**.| Without global filer, custom filter doesn't need **HttpConfiguration** registration.  Filters are very handy to attach with classes, methods as attribute.|
