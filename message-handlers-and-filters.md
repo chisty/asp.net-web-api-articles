@@ -16,7 +16,7 @@ Message handlers are a set of classes which intercept Http request and response 
 
 Typically, a series of message handlers are chained together. Every handler receives the Http request sequentially, does some processing if needed, gives the request to next handler until any handler generates a response, at which point the response message flows back out of the pipeline.
 
-# IMAGE INSERT
+![alt text](https://github.com/chisty/asp.net-web-api-articles/tree/master/images/mhf_1.png "Message handler pipeline")
 
 Web host gives the request to *HttpServer* which passes through a series of **HttpMessageHandlers**. This chain of responsibility ends at **HttpControllerDispatcher**. The dispatcher then sends the request to appropriate controller.  Both *HttpServer*, *HttpControllerDispatcher* are built-in message handler.
 
