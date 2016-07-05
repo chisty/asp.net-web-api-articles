@@ -2,7 +2,7 @@
 
 In this article, we will cover:
 
-*	Exploring the Message Handler Mechanism
+*	[Exploring the Message Handler Mechanism](https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#exploring-the-message-handler-mechanism)
 *	Creating Custom Message handlers
 *	Registering Custom Message Handlers
 *	Implementing Filters
