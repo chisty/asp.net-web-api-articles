@@ -2,4 +2,4 @@
 
 All the articles link are listed below:
 
-* [Message Handlers & Filters] (../blob/master/message-handlers-and-filters.md Message Handlers & Filters)
+* [Message Handlers & Filters] (../master/message-handlers-and-filters.md Message Handlers & Filters)
