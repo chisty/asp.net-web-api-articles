@@ -461,3 +461,7 @@ Though message handler and filter seems very likely, the major difference betwee
 | They invoked and perform in Http message level, not in **ApiController** level.| They invoked and perform in **ApiController** level.|
 | As we can use a chain of handlers and the request flows in and out sequentially, we can write complex logics in them which work sequentially. We can modify the request and also the response headers before the response goes out through the Web API pipeline. | Filters are in different types with different purposes. Some filters invokes if there is some specific condition happens (**ExceptionFilters** fires if there is any exception). Some filter works on **ApiController** level. Filters can be invoked globally, per controller, per action.|
 | We need to register custom message handler separately in **HttpConfiguration**.| Without global filer, custom filter doesn't need **HttpConfiguration** registration.  Filters are very handy to attach with classes, methods as attribute.|
+
+## Summary
+
+Message handlers are filters are a great way for writing our custom logics in request-response pipeline. Lots of complex logics and codes can be executed on these handlers and filters, and **ApiControllers** do not need to implement those again. This eventually helps us to write clean code. In this chapter, we have learned what is message hander and filter, why we use them. We have learnt to create and implement custom message handler and custom filter.
