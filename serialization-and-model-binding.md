@@ -273,7 +273,7 @@ When we sent request from client to serve by setting the Accept-Header *"text/do
 
 We always need to validate the model before performing actions in **ApiController**. Model validation takes place in client side mainly, but we also need to implement server side validation. We can achieve this by using data annotation. 
 
-###How to do it
+### How to do it
 
 Here is our *BookItem* class. 
 
