@@ -365,7 +365,7 @@ When Web Api calls a method of any **ApiController**, it sets value for the para
 
 We will first see how to read a complex type from the request body using *[FromBody]*. But, there is a restriction in that. We can read only one value from the message body. So, if we want to post multiple complex types, we need to implement our custom model binder. We will see these two examples in the next section.
 
-###How to do it
+### How to do it
 
 Here is the code implementing the *[FromBody]* attribute in the **ApiController's** HttpPut action: 
 
