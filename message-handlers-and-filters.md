@@ -2,12 +2,12 @@
 
 In this article, we will cover:
 
-*	[Exploring the Message Handler Mechanism] (https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#exploring-the-message-handler-mechanism)
-*	[Creating Custom Message handlers] (https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#creating-custom-message-handlers)
-*	[Registering Custom Message Handlers] (https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#registering-custom-message-handlers)
-*	[Implementing Filters] (https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#implementing-filters)
-*	[Registering Filters] (https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#registering-filters)
-*	[Differentiating between Message handler and Filters] (https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#differentiating-between-message-handler-and-filters)
+*	[Exploring the Message Handler Mechanism](https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#exploring-the-message-handler-mechanism)
+*	[Creating Custom Message handlers](https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#creating-custom-message-handlers)
+*	[Registering Custom Message Handlers](https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#registering-custom-message-handlers)
+*	[Implementing Filters](https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#implementing-filters)
+*	[Registering Filters](https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#registering-filters)
+*	[Differentiating between Message handler and Filters](https://github.com/chisty/asp.net-web-api-articles/blob/master/message-handlers-and-filters.md#differentiating-between-message-handler-and-filters)
 
 
 ## Exploring the Message Handler Mechanism
