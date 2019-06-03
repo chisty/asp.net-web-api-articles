@@ -2,11 +2,11 @@
 
 In this article, we will cover:
 
-*	[Creating Media Formatter] (https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#creating-media-formatter)
-*	[Serializing the Data] (https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#serializing-the-data)
-*	[Negotiating the Content] (https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#negotiating-the-content)
-*	[Validating the Model] (https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#validating-the-model)
-*	[Binding Parameters] (https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#binding-parameters)
+*	[Creating Media Formatter](https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#creating-media-formatter)
+*	[Serializing the Data](https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#serializing-the-data)
+*	[Negotiating the Content](https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#negotiating-the-content)
+*	[Validating the Model](https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#validating-the-model)
+*	[Binding Parameters](https://github.com/chisty/asp.net-web-api-articles/blob/master/serialization-and-model-binding.md#binding-parameters)
 
 Serialization and model binding are important topic in Web API as their performance impact is very significant. At times of working with custom *MIME types*, data validation, these concepts are very useful. We can implement our own custom logic in media formatter, data serialization, content negotiation and model validation. These gives us enough flexibility to write clean and simple code with complex data types. 
 
